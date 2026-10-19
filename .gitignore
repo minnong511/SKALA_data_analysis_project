@@ -2,3 +2,8 @@
 
 # Local feature engineering notes
 /FEATURE_ADDITIONS.local.md
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+.DS_Store

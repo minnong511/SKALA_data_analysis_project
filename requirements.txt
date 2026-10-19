@@ -1,0 +1,12 @@
+numpy>=2.0
+pandas
+scipy
+matplotlib
+pillow
+rdkit
+scikit-learn
+ipython
+ipykernel
+jupyterlab
+nbformat
+nbclient
