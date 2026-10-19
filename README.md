@@ -1,3 +1,7 @@
+[molecular-toxicity-eda.lee-min-hyeong.chatgpt.site/?view=1](https://molecular-toxicity-eda.lee-min-hyeong.chatgpt.site/?view=1)
+
+
+
 모델 개발, EDA를 통한 성능 개선 및 최종 예측 결과 도출
 
 # 1. 프로젝트 개요
@@ -154,3 +158,8 @@ Boxplot이나 Histogram을 활용, clogp의 분포 차이가 존재하는지 확
 - 모델 개발자: 예측 성능 향상 방안
 - 데이터 분석가: 데이터에서의 발견 및 의사결정 지원 방안
 - AX 기획자: AI를 통한 기존 업무 문제 개선 및 효과 검증 방안
+
+
+## 학습 전략 상세
+
+[학습 전략과 실험 순서](TRAINING_STRATEGY.md)에서 검증 분할, 베이스라인, 피처 비교와 선택, 앙상블, 최종 제출 순서를 확인.

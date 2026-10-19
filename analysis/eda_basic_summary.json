@@ -1,0 +1,107 @@
+{
+  "source_sha256": "cb7118a9533e36d81cdb4aa2e9318e9fa0b80faa70d132d7d3b2009e81fca5d8",
+  "executed_at": "2026-10-19T02:06:55.039805+00:00",
+  "raw_rows": 8349,
+  "columns": 3078,
+  "unique_molecules": 8348,
+  "same_structure_label_conflicts": 0,
+  "majority_f1": 0.7046776821037933,
+  "quality": [
+    {
+      "항목": "결측 셀",
+      "건수": 0,
+      "단위": "셀"
+    },
+    {
+      "항목": "완전히 같은 행의 추가 중복",
+      "건수": 0,
+      "단위": "행"
+    },
+    {
+      "항목": "같은 SMILES 문자열의 추가 중복",
+      "건수": 0,
+      "단위": "행"
+    },
+    {
+      "항목": "같은 분자 구조의 추가 중복",
+      "건수": 1,
+      "단위": "행"
+    },
+    {
+      "항목": "SMILES 파싱 실패",
+      "건수": 0,
+      "단위": "행"
+    },
+    {
+      "항목": "0, 1 이외 label",
+      "건수": 0,
+      "단위": "셀"
+    },
+    {
+      "항목": "0, 1 이외 Fingerprint",
+      "건수": 0,
+      "단위": "셀"
+    },
+    {
+      "항목": "유한수가 아닌 물성값",
+      "건수": 0,
+      "단위": "셀"
+    }
+  ],
+  "class_balance": [
+    {
+      "label": 0,
+      "class": "독성 있음 (0)",
+      "count": 3807,
+      "percent": 45.59827524254402
+    },
+    {
+      "label": 1,
+      "class": "독성 없음 (1)",
+      "count": 4542,
+      "percent": 54.40172475745598
+    }
+  ],
+  "correlations": [
+    {
+      "property": "MolWt",
+      "pearson": 0.0058225867991785205,
+      "spearman": 0.00935617630965318
+    },
+    {
+      "property": "clogp",
+      "pearson": 0.2730471700394966,
+      "spearman": 0.2804557342589339
+    },
+    {
+      "property": "sa_score",
+      "pearson": -0.0777768090464354,
+      "spearman": -0.07118096992458127
+    },
+    {
+      "property": "qed",
+      "pearson": -0.08387282423532903,
+      "spearman": -0.08376086410487134
+    }
+  ],
+  "fingerprints": [
+    {
+      "family": "ECFP",
+      "columns": 1024,
+      "constant_columns": 0,
+      "active_percent": 5.483967484878429
+    },
+    {
+      "family": "FCFP",
+      "columns": 1024,
+      "constant_columns": 0,
+      "active_percent": 4.384963300245539
+    },
+    {
+      "family": "PTFP",
+      "columns": 1024,
+      "constant_columns": 49,
+      "active_percent": 42.35434258593844
+    }
+  ]
+}

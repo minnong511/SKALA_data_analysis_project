@@ -1,0 +1,72 @@
+{
+  "source_sha256": "cb7118a9533e36d81cdb4aa2e9318e9fa0b80faa70d132d7d3b2009e81fca5d8",
+  "executed_at": "2026-10-19T02:14:34.935618+00:00",
+  "rows": [
+    {
+      "example": "molecule-example",
+      "description": "분자 기록 예시",
+      "record": 1,
+      "SMILES": "Nc1ccncc1",
+      "label": 1,
+      "MolWt": 94.117,
+      "clogp": 0.6638,
+      "sa_score": 1.95105974,
+      "qed": 0.512651003,
+      "ecfp_display_start": 143,
+      "ecfp_display_bits": "000010000000000000000000"
+    },
+    {
+      "example": "duplicate-a",
+      "description": "동일 구조의 첫 기록",
+      "record": 7300,
+      "SMILES": "COc1ccc2nccc([C@H](O)CC[C@@H]3CCN(CCSC4=CC=C[Se]4)C[C@@H]3C(=O)O)c2c1",
+      "label": 1,
+      "MolWt": 533.552,
+      "clogp": 3.929,
+      "sa_score": 4.097021114,
+      "qed": 0.301970085,
+      "ecfp_display_start": 0,
+      "ecfp_display_bits": "010000000000000000000000"
+    },
+    {
+      "example": "duplicate-b",
+      "description": "동일 구조의 두 번째 기록",
+      "record": 8271,
+      "SMILES": "COc1ccc2nccc([C@H](O)CC[C@@H]3CCN(CCSc4ccc[se]4)C[C@@H]3C(=O)O)c2c1",
+      "label": 1,
+      "MolWt": 533.552,
+      "clogp": 3.929,
+      "sa_score": 4.097021114,
+      "qed": 0.301970085,
+      "ecfp_display_start": 0,
+      "ecfp_display_bits": "010000000000000000000000"
+    },
+    {
+      "example": "stereo-unspecified",
+      "description": "공간 배치 정보 없음",
+      "record": 99,
+      "SMILES": "CN1CC=CCC(C1)c2ccc(Cl)c(Cl)c2",
+      "label": 0,
+      "MolWt": 256.176,
+      "clogp": 3.9687,
+      "sa_score": 2.983891546,
+      "qed": 0.687054663,
+      "ecfp_display_start": 29,
+      "ecfp_display_bits": "000010000000000000000000"
+    },
+    {
+      "example": "stereo-specified",
+      "description": "공간 배치 정보 있음",
+      "record": 100,
+      "SMILES": "CN1CC=CC[C@@H](C1)c2ccc(Cl)c(Cl)c2",
+      "label": 1,
+      "MolWt": 256.176,
+      "clogp": 3.9687,
+      "sa_score": 2.983891546,
+      "qed": 0.687054663,
+      "ecfp_display_start": 29,
+      "ecfp_display_bits": "000010000000000000000000"
+    }
+  ],
+  "drawing": "RDKit 2D structural drawings from train.csv; not experimentally measured 3D shapes."
+}

@@ -1,0 +1,35 @@
+{
+  "local_rows": 8349,
+  "local_sha256": "cb7118a9533e36d81cdb4aa2e9318e9fa0b80faa70d132d7d3b2009e81fca5d8",
+  "rdkit_version": "2026.09.1",
+  "matching": "canonical isomeric SMILES, default RDKit; no desalting or tautomer normalization",
+  "sources": {
+    "cardiotox": {
+      "url": "https://raw.githubusercontent.com/Abdulk084/CardioTox/master/data/train_validation_cardio_tox_data.tar.xz",
+      "download_sha256": "2afe490f6aeaf697f3c3897588235f679e6cc08f6865ec28ae9cc3c2bce4b2c3",
+      "public_rows": 12620,
+      "public_parse_failures": 0,
+      "matched_local_rows": 6954,
+      "matched_local_unique_molecules": 6954,
+      "joined_pairs": 6954,
+      "inverse_label_agreement_pairs": 6944,
+      "inverse_label_agreement_percent": 99.8561978717285,
+      "public_activity_counts": {
+        "1": 6643,
+        "0": 5977
+      }
+    },
+    "toxtree": {
+      "url": "https://zenodo.org/records/5807719/files/hERG_Dataset.csv?download=1",
+      "download_sha256": "f028e0dbdc46fd587e3f75e296e06922387e3e5dc7288837d7e0da40ecbcc80b",
+      "public_rows": 8879,
+      "public_parse_failures": 0,
+      "matched_local_rows": 5590,
+      "matched_local_unique_molecules": 5590,
+      "joined_pairs": 5591,
+      "label0_vs_pIC50_ge5_agreement_percent_pairs": 91.8261491683062,
+      "note": "Exploratory threshold comparison, not proof of local assay threshold; duplicate public keys can multiply pairs."
+    }
+  },
+  "conclusion": "Strong evidence of hERG-related labels; exact local lineage and assay cut-off remain unverified. Do not relabel disagreements."
+}
