@@ -1,319 +1,66 @@
-[molecular-toxicity-eda.lee-min-hyeong.chatgpt.site/?view=1](https://molecular-toxicity-eda.lee-min-hyeong.chatgpt.site/?view=1)
-
-
-
-모델 개발, EDA를 통한 성능 개선 및 최종 예측 결과 도출
-
-# 1. 프로젝트 개요
-
-주제 : 머신러닝 기반 신약 후보물질 독성 예측
-
-| 항목          | 내용                                     |
-| ------------- | ---------------------------------------- |
-| 문제 유형     | Binary Classification                    |
-| 학습 데이터   | 8,349개                                  |
-| 예측 데이터   | 927개                                    |
-| 입력 데이터   | SMILES, Molecular Fingerprint, 분자 특성 |
-| 예측 대상     | 독성 여부                                |
-| Label = 1     | 독성 없음                                |
-| Label = 0     | 독성 있음                                |
-| 주요 평가지표 | F1 Score                                 |
-| 제출 파일     | predict_output_작성자.csv                |
-
-이진분류 → 독성 있음: 0, 독성 없음: 1
-
----
-
-**Q1. 해결하려는 문제 정의 (Problem)**
-
-**Q2. 문제 해결에 필요한 데이터 파악 (Data)**
-
-**Q3. 문제 해결 방법 수립 (Solution)**
-
-**Q4. 실제 문제 해결 여부 검증 (Validation)**
-
-## 기존 프로세스
-
-### ① As-Is: 기존 업무 프로세스 분석
-
-일반적인 신약 개발에서는 후보물질을 발굴하고, 다양한 실험을 통해 효능과 안전성을 검증
-
-후보물질 발굴 → 선도 화합물 탐색 및 최적화 → 비임상시험 → 임상시험 → 시판
-
-**pain point**
-
-- 후보물질 평가에 상당한 시간과 비용 발생
-
-### ② 문제 정의: 개선 대상 파악
-
-신약 후보물질의 안전성 검증에 많은 실험과 비용 필요. 실험 투입 전 독성 가능성이 높은 물질의 선별을 통한 불필요한 실험 감소 가능.
-
-문제 정의 : 단순한 독성 예측을 넘어 **독성 예측의 필요성 설명**
-
-### ③ To-Be: AI를 통한 개선 방안
-
-**기존 프로세스**
-
-후보물질 선정 → 실험을 통한 독성 평가 → 결과 확인 → 후속 개발 여부 결정
-
-**AI 적용 프로세스**
-
-후보물질 선정 → AI 기반 독성 예측 → 실험 우선순위 선정 → 독성 평가 실험 → 후속 개발 여부 결정
-
-### ④ 데이터 분석(EDA): AI를 통한 해결 가능성 확인
-
-다음 항목 확인 필요.
-
-- 독성 여부와 관련된 분자 특성의 존재 여부
-- 독성 물질과 비독성 물질의 분포 차이
-- 학습 데이터의 충분성
-- 클래스 불균형 존재 여부
-- 데이터의 중복 및 오류 존재 여부
-
-### ⑤ 모델 개발: 실제 독성 예측 가능성 검증
-
-Random Forest, LightGBM 등의 모델 학습 및 성능 평가.
-
-기술적 성능과 업무적 성과의 구분 필요.
-
-| 구분        | 평가 항목                                      |
-| ----------- | ---------------------------------------------- |
-| 기술적 KPI  | F1 Score, Recall, Precision                    |
-| 업무적 KPI  | 실험 건수 감소, 비용 절감, 평가 소요 시간 단축 |
-| 안전성 지표 | 독성 물질을 안전하다고 잘못 판단하는 비율      |
-
----
-
-# 2. 오늘 추천하는 전체 진행 순서
-
-① 데이터 확인 → ② EDA → ③ 데이터 전처리 → ④ Baseline 모델 → ⑤ 성능 평가 → ⑥ 성능 개선 → ⑦ 최종 예측 및 제출
-
-| 단계 | 작업                       | 예상 시간 | 목표             |
-| ---- | -------------------------- | --------- | ---------------- |
-| 1    | 데이터 구조 및 결측치 확인 | 20분      | 데이터 이해      |
-| 2    | EDA 및 클래스 분포 확인    | 40분      | 문제 특성 파악   |
-| 3    | 데이터 전처리              | 30분      | 학습 데이터 구성 |
-| 4    | Baseline 모델 개발         | 50분      | 초기 성능 확보   |
-| 5    | 모델 성능 분석             | 40분      | 개선 방향 결정   |
-| 6    | 모델 성능 개선             | 90분      | 최적 모델 선정   |
-| 7    | 최종 예측 및 제출          | 30분      | 결과물 생성      |
-| 8    | 결과 정리                  | 30분      | 프로젝트 마무리  |
-
-## Step 1. 데이터 구조 확인
-
-데이터 확인
-
-1. 데이터 크기 및 컬럼 구성
-2. 결측치 존재 여부
-3. 중복 데이터 존재 여부
-4. Label 0과 1의 분포
-5. 각 Feature의 데이터 타입
-
-| Feature  | 개수  | 설명                      |
-| -------- | ----- | ------------------------- |
-| SMILES   | 1     | 분자 구조를 문자열로 표현 |
-| ECFP     | 1,024 | 분자 구조 특성            |
-| FCFP     | 1,024 | 분자의 기능적 특성        |
-| PTFP     | 1,024 | 분자 패턴 특성            |
-| MolWt    | 1     | 분자량                    |
-| clogp    | 1     | 지용성                    |
-| sa_score | 1     | 합성 난이도               |
-| qed      | 1     | 약물 유사도               |
-| label    | 1     | 독성 여부                 |
-
-학습에 활용 가능한 **수치형 Feature 총 3,076개**
-
-## Step 2. EDA (40분)
-
-모델 학습 전 데이터의 특성 파악
-
-### 첫 번째: Label 분포 분석
-
-독성 물질과 비독성 물질의 비율을 확인
-
--> 균형 , 불균형인지 파악
-
-### 두 번째: 분자 특성과 독성의 관계 분석
-
-Boxplot이나 Histogram을 활용, clogp의 분포 차이가 존재하는지 확인
-
-모델 활용을 통한 신약 개발 과정의 의사결정 개선 가능성 검토
-
-# 3. 메모
-
-**① 탐색적 데이터 분석 (EDA)**
-
-목표: 데이터에서 발생하는 현상 이해
-
-예: 특정 공정에서 불량이 발생하는 원인 분석. AI 모델 개발이 반드시 필요하지는 않음.
-
-**② 예측 모델 개발**
-
-목표: 데이터로 미래의 결과나 알려지지 않은 값 예측
-
-이번 신약 독성 예측 프로젝트에 해당.
-
-데이터의 특성, 모델 성능, 일반화 가능성을 중심으로 접근 필요.
-
-- 모델 개발자: 예측 성능 향상 방안
-- 데이터 분석가: 데이터에서의 발견 및 의사결정 지원 방안
-- AX 기획자: AI를 통한 기존 업무 문제 개선 및 효과 검증 방안
-
-
-## 학습 전략 상세
-
-[학습 전략과 실험 순서](TRAINING_STRATEGY.md)에서 검증 분할, 베이스라인, 피처 비교와 선택, 앙상블, 최종 제출 순서를 확인.
-
-## 누수 경계를 분리한 학습
-
-`Train.ipynb` 또는 `python -m analysis.train_safe`로 실행합니다. 추가 패키지는 `requirements-training.txt`에 있습니다.
-
-과거 최고 LightGBM, balanced LightGBM, XGBoost 앙상블 계열을 고정합니다. 과거 최고 입력과 동일한 3,091개 구성으로, sa_score와 qed를 제외한 교체 구성입니다. 모델별 가중치와 임계값은 안쪽 5-Fold에서만 정하고, 바깥 Scaffold 5-Fold에서 평가합니다. 모든 전처리는 해당 학습 Fold에서 fit합니다. 기존 OOF, 모델, Top 피처 목록과 외부 라벨은 읽지 않습니다.
-
-결과와 배포용 전체 재학습 모델은 `Data/training/safe_ensemble_v1_5fold/`에 저장합니다. 전체 재학습 모델의 새 독립 평가 점수는 없습니다. 이미 전체 자료를 탐색한 이력이 남으므로 이번 결과는 내부 검증이며, 독립 검증에는 새 평가 자료가 필요합니다.
-
-## Recall 우선 기준선
-
-`Train.ipynb` 또는 아래 명령으로 실행합니다. 기존 모델, 피처, 분할과 앙상블 가중치 계산은 유지합니다.
+# 신약 후보물질 독성 예측
+
+분자 구조와 물성으로 독성 여부를 예측합니다.
+
+## 프로젝트
+
+| 항목 | 내용 |
+|---|---|
+| 학습 데이터 | 8,349개 분자 |
+| 원본 경로 | `Data/input_data/train.csv` |
+| 라벨 | 0 = 독성, 1 = 비독성 |
+| 입력 피처 | ECFP, FCFP, PTFP, 물성, 총 3,091개 |
+| 모델 | LightGBM, XGBoost, ExtraTrees, 로지스틱 회귀, 앙상블 |
+| 검증 | 안쪽, 바깥 Scaffold 5-Fold |
+| 현재 목표 | 비독성 F1 ≥ 0.82에서 독성 Recall 최대화 |
+| 희망 F1 | 0.83 이상 |
+
+## 실험 결과
+
+바깥 5-Fold 평균입니다. 기존 전체 데이터 탐색 이력이 있는 내부 검증 결과입니다.
+
+| 실험 | 비독성 F1 | 독성 Recall |
+|---|---:|---:|
+| F1 우선 기준선 | 0.7974 | 0.6132 |
+| Recall 0.90 기준선 | 0.6639 | 0.9062 |
+| Optuna, Recall 0.87 조건 | 0.7202 | 0.8684 |
+| 피처 선택 없는 대조군 | 0.7174 | 0.8708 |
+| 피처 선택 포함 탐색 | 0.7182 | 0.8708 |
+
+피처 선택의 F1 개선은 약 0.0008입니다. 새 목표인 F1 ≥ 0.82 탐색은 아직 실행하지 않았습니다.
+
+## 파일
+
+| 파일 | 용도 |
+|---|---|
+| [EDA.ipynb](EDA.ipynb) | 데이터 탐색 |
+| [Train.ipynb](Train.ipynb) | 앙상블 기준선 |
+| [Search.ipynb](Search.ipynb) | 랜덤 탐색 |
+| [Optuna.ipynb](Optuna.ipynb) | Optuna TPE 탐색 |
+| [FeatureSelection.ipynb](FeatureSelection.ipynb) | ANOVA, gain 기반 피처 선택 비교 |
+| [analysis/f1_floor_search.py](analysis/f1_floor_search.py) | F1 하한 조건의 Recall 최적화 |
+
+## 실행
 
 ```bash
-python -m analysis.train_safe --recall-target 0.90
+python -m pip install -r requirements-training.txt
+
+# 기존 Optuna 결과가 없을 때 먼저 실행
+python -u -m analysis.optuna_recall --trials 20
+
+# 새 목표의 계획 확인, 추가 탐색
+python -m analysis.f1_floor_search --dry-run
+python -u -m analysis.f1_floor_search --trials 12
 ```
 
-안쪽 OOF에서 독성 Recall ≥ 0.90을 만족하는 임계값 중 비독성 F1 최대값을 선택합니다. 0~1을 0.01 간격으로 탐색하고 전체 독성 판정 끝점을 포함합니다. 바깥 Fold에서 Recall 0.90이 보장되지는 않습니다. 목표는 바깥 Fold 평균 비독성 F1 ≥ 0.85, 독성 Recall ≥ 0.90이며, Fold별 값과 목표 동시 달성 Fold 수도 함께 기록합니다.
+새 탐색은 같은 Fold의 기존 안쪽 예측을 재활용하고, Fold당 12개 후보를 추가 평가합니다.
 
-저장 경로는 `Data/training/recall90_baseline_5fold/`입니다. 기존 F1 우선 결과는 보존합니다. 이 기준선은 개발용 내부 검증이며, 이후 반복 실험의 최종 독립 평가에는 새 자료가 필요합니다.
+| 항목 | 안내 |
+|---|---|
+| 새 결과 경로 | `Data/training/f1floor82_recall_v1/` |
+| 중단 후 재개 | 같은 명령에 `--resume` 추가 |
+| 주요 출력 | Fold별 점수, 예측, 선택 기록, Optuna DB |
+| 데이터, 학습 결과 | `Data/`에 보관, Git 미포함 |
+| F1 하한 미달 | 최고 F1을 진단용으로 기록, 목표 미달 표시 |
 
-## Recall 제약 모델 탐색
-
-`Search.ipynb` 또는 아래 명령으로 여러 모델과 파라미터를 비교합니다. 기본 선택 기준은 **안쪽 OOF 독성 Recall ≥ 0.90인 임계값 중 비독성 F1 최대화**입니다. 바깥 검증에서는 이 Recall이 보장되지 않습니다.
-
-```bash
-# 후보와 학습 횟수 확인, 학습하지 않음
-python -m analysis.search_recall --trials 12 --dry-run
-
-# 4개 후보로 첫 비교
-python -m analysis.search_recall --trials 4 --output Data/training/recall_search_pilot
-
-# 12개 후보로 탐색 확대, 새 경로 사용
-python -m analysis.search_recall --trials 12 --output Data/training/recall_search_v1
-
-# 중단된 실행 재개, 기존과 동일한 옵션 및 코드 필요
-python -m analysis.search_recall --trials 12 --output Data/training/recall_search_v1 --resume
-```
-
-- 모델: LightGBM, XGBoost, ExtraTrees, 로지스틱 회귀. 고정 seed 랜덤 탐색이며, 첫 후보는 기존 설정의 단일 LightGBM입니다.
-- 탐색: 독성 샘플 가중치 1~5, 트리 수, 깊이/리프 수, 규제, 학습률, 피처 샘플링, 로지스틱 회귀 C. 모델별 적용 범위는 `candidates()`에 정의합니다.
-- 피처: 전체 또는 ECFP, FCFP, PTFP, ECFP+FCFP에 공통 물성 피처를 결합합니다. ANOVA 피처 선택은 미사용 또는 Top 256/512/1024를 비교하며 학습 Fold에서만 fit합니다. 로지스틱 회귀 스케일링도 동일합니다.
-- 앙상블: 안쪽 OOF에서 모델 계열별 상위 후보를 최대 3개 골라 동일 가중 평균하고, 단일 모델과 함께 비교합니다.
-- 예산: 4개 후보는 최대 115회, 12개는 최대 315회 fit. `--jobs 4`는 각 모델의 CPU 사용 수이며 후보는 순차 실행합니다. 안쪽과 바깥 모두 5-Fold입니다.
-- Recall 조정: `--recall-target 0.92`로 안쪽 기준을 높이는 실험도 가능합니다. 실험별 새 출력 폴더를 사용합니다. 기본 목표는 그대로 0.90입니다.
-- 직접 후보 지정: `--dry-run` 출력의 `candidates` 목록을 JSON 배열로 저장하고 `--candidates 경로.json`으로 전달합니다. 모델 파라미터는 각 라이브러리의 sklearn estimator 인자를 사용합니다.
-- 재시작: 완료된 후보의 안쪽 OOF 캐시를 재사용합니다. 중단된 후보는 다시 학습합니다. 소스 데이터, 코드, 패키지 버전, 후보 설정이 다르면 재개하지 않습니다.
-
-출력은 `outer_metrics.csv`, `outer_predictions.csv`, `evaluation.json`, `baseline_comparison.csv`, Fold별 안쪽 `leaderboard.csv`와 임계값 곡선, 선택 고정 기록, `split_audit.json`입니다. 후보별 순위는 안쪽 점수이며 최종 성능 점수가 아닙니다. 바깥 점수는 Fold마다 다른 후보를 선택할 수 있는 **탐색 절차 전체의 내부 검증 성능**입니다. 이 스크립트는 평가용이며 배포용 전체 재학습 모델을 만들지 않습니다.
-
-먼저 가중치와 모델 계열을 넓게 살피고, 유망한 영역을 새 후보 JSON으로 좁힙니다. 바깥 점수를 보고 탐색을 반복하면 개발 평가에 적응하므로, 최종 성능 확인에는 새 독립 자료가 필요합니다. Recall 0.90과 비독성 F1 0.85의 동시 달성을 보장하지 않습니다.
-
-## Optuna 탐색, 현재 목표 Recall 0.87
-
-현재 탐색 목표는 **독성 Recall ≥ 0.87 조건에서 비독성 F1 최대화**, F1 달성 목표는 0.85입니다. `Optuna.ipynb` 또는 다음 명령으로 실행합니다. 이 작업에서 만든 로컬 `.venv`는 기존 sllm 환경의 학습 패키지를 사용하고 Optuna를 추가한 환경입니다.
-
-```bash
-# 계획 확인
-.venv/bin/python -m analysis.optuna_recall --trials 20 --dry-run
-
-# 첫 탐색: 바깥 Fold마다 20개 trial, 총 100개 trial
-.venv/bin/python -u -m analysis.optuna_recall --trials 20
-
-# 중단된 실행 재개
-.venv/bin/python -u -m analysis.optuna_recall --trials 20 --resume
-
-# 탐색 예산 확대: 기존 trial을 포함해 Fold마다 총 50개까지
-.venv/bin/python -u -m analysis.optuna_recall --trials 50 --resume
-```
-
-- 기본 결과 경로: `Data/training/optuna_recall87_v1/`.
-- 모델과 피처 범위는 기존 탐색과 같으며 TPE가 모델별 파라미터, 독성 가중치, 지문 조합, 피처 선택 개수를 탐색합니다. 처음 네 trial은 모델 계열을 하나씩 시도합니다. 최초 8회는 초기 탐색이고 이후 앞선 결과를 참고합니다.
-- 각 trial은 안쪽 Scaffold 5-Fold OOF로 평가합니다. 임계값은 실제 예측값 경계를 모두 확인해 Recall ≥ 0.87 조건에서 F1을 최대화합니다. 같은 예측값을 가진 샘플은 함께 판정합니다.
-- MedianPruner는 완료된 초기 trial 8개 이후, 안쪽 Fold를 최소 3개 평가한 후보부터 중단할 수 있습니다. 중단된 trial도 예산에 포함합니다. 트리 학습의 early stopping은 사용하지 않습니다.
-- 서로 다른 계열의 안쪽 상위 후보 최대 3개를 동일 가중 앙상블한 결과도 단일 모델과 비교합니다. 안쪽 결과만으로 선택하고 바깥 Fold에서 평가합니다.
-- 총 학습 상한은 20 trial에서 515회, 50 trial에서 1,265회입니다. Pruning에 따라 실제 횟수는 줄어듭니다. 예상 소요 시간은 모델과 피처 조합에 따라 달라집니다.
-- `studies.sqlite3`, Fold별 `*_trials.csv`, `*_selected.json`, 예측 캐시, sampler 상태, 바깥 점수와 예측, 분할 감사 기록을 저장합니다. Optuna DB와 sampler 상태를 함께 저장해 재개합니다. 프로세스가 중간에 종료된 trial은 재시도합니다.
-- 소스 데이터, 코드, 패키지 버전, Recall 목표를 바꾸면 새 출력 경로가 필요합니다. `--trials`만 늘리는 예산 확장은 가능합니다. 재개 중에는 같은 폴더에서 다른 탐색 프로세스를 동시에 실행하지 않습니다.
-- `baseline_comparison.csv`는 기존 F1 우선, Recall 0.90 기준선과 비교합니다. 각 실험의 Recall 선택 조건은 다릅니다. Fold마다 모델이 다를 수 있으므로 바깥 평균은 탐색 절차의 성능이며, 배포용 전체 재학습 모델은 포함하지 않습니다.
-
-Recall 0.87은 안쪽 선택 조건으로, 바깥 평가에서 보장되지 않습니다. 목표 달성 여부와 최저 Fold Recall을 함께 확인합니다. 예산을 확대하며 바깥 점수를 반복 확인한 결과는 개발용 내부 평가이며 독립 최종 성능이 아닙니다. Optuna 저장과 재개 방식은 [공식 RDB 문서](https://optuna.readthedocs.io/en/stable/tutorial/20_recipes/001_rdb.html)를 참고합니다.
-
-### Optuna 첫 실행 결과
-
-Fold당 20 trial, 총 100 trial 중 82개 완료, 18개 조기 중단. 원본 8,349행의 바깥 OOF를 모두 생성했습니다.
-
-| 실험 | 평균 비독성 F1 | 평균 독성 Recall | 최저 Fold Recall |
-|---|---:|---:|---:|
-| 기존 앙상블, Recall 0.87 조건 | 0.7015 | 0.8802 | 0.8645 |
-| Optuna 20 trial/Fold, Recall 0.87 조건 | 0.7202 | 0.8684 | 0.8395 |
-
-기존 앙상블의 Recall 0.87 기준선은 `recall90_baseline_5fold`에 저장된 안쪽 임계값별 지표로 선택 조건만 바꾸고, 기존 바깥 예측 확률을 재사용해 산출했습니다. 바깥 라벨로 임계값을 선택하지 않았습니다. 저장 경로는 `Data/training/recall87_cached_baseline/`입니다. 기존 기준선은 0.01 간격 임계값 탐색이며 Optuna는 실제 점수 경계를 모두 확인하므로 차이는 모델 탐색과 임계값 탐색 효과를 함께 포함합니다.
-
-Optuna 결과는 F1이 약 0.0187 높고 Recall이 약 0.0118 낮습니다. 평균 Recall 0.87과 F1 0.85의 동시 목표는 미달이며, 5개 Fold 중 3개가 Recall 0.87을 넘었습니다. 현재 결과를 목표 달성 모델로 채택하지 않습니다. 바깥 평가를 보고 임계값을 다시 조정하지 않았습니다.
-
-다음 실험 후보는 안쪽 Recall에 여유를 두는 조건(예: 0.89)과 더 넓은 탐색 예산입니다. 목표 또는 코드를 바꿀 때는 새 출력 경로로 실행합니다. 동일 조건의 예산만 늘릴 때는 `--trials 50 --resume`을 사용할 수 있습니다. 반복 확인한 바깥 점수는 개발용 내부 검증입니다.
-
-NumPy matmul 경고가 정상 난수 입력에서도 재현됐으며 독립 계산과 일치하고 예측값은 유효함을 확인했습니다. 진단 결과는 `numerical_diagnostic.json`, 최종 선택 모델은 `selected_models.csv`, 후보 상태 수는 `trial_counts.csv`에 저장했습니다. 최종 선택에는 로지스틱 회귀가 포함되지 않았습니다.
-
-## 유망한 모델의 피처 선택 집중 실험
-
-`FeatureSelection.ipynb` 또는 다음 명령으로 실행합니다.
-
-```bash
-.venv/bin/python -m analysis.focused_features --dry-run
-.venv/bin/python -u -m analysis.focused_features
-# 중단된 동일 실험을 재개
-.venv/bin/python -u -m analysis.focused_features --resume
-```
-
-- 대상은 LightGBM, XGBoost입니다. 이전 Optuna의 **각 바깥 Fold에 대응하는 안쪽 완료 trial**에서 모델별 최고 설정을 가져옵니다. 다른 Fold나 바깥 점수로 파라미터를 고르지 않습니다. 원본과 안쪽/바깥 분할이 동일한지 감사 기록으로 확인합니다.
-- 모델 파라미터, 독성 샘플 가중치, 지문 조합은 고정하고 선택 방법과 개수만 비교합니다. 이전 trial에서 적용했던 Top-K는 해제한 뒤 새로 실험합니다.
-- 모델당 선택 없음 1개, ANOVA F 통계 기반 선택 5개, 모델 gain 중요도 기반 선택 5개로 총 11개 구성을 모두 비교합니다. 선택 개수는 256, 512, 768, 1,024, 1,536개이며 남은 피처보다 크면 남은 개수로 제한합니다.
-- 결측 처리, 상수/중복 제거, ANOVA와 모델 중요도 순위는 **각 학습 Fold에서만** 계산합니다. gain 순위는 해당 모델의 전체 피처 학습으로 얻습니다. 중요도는 선택용 휴리스틱이며 인과적 설명이 아닙니다.
-- 안쪽 Recall ≥ 0.87 조건에서 비독성 F1 최대 임계값을 선택합니다. 두 모델의 상위 설정을 평균한 앙상블도 비교합니다.
-- 같은 안쪽 검증에서 피처 선택 없는 모델/앙상블만으로 별도 대조군을 선택합니다. 바깥 Fold에서는 집중 탐색 선택 결과와 대조군을 모두 평가해, 이번 실험의 피처 선택 추가 효과를 비교합니다.
-- 이전 모델 계열 탐색은 Optuna로 수행했지만, 이번에는 고정된 모델의 22개 단일 모델 구성과 2개 앙상블을 빠짐없이 비교하는 통제 실험입니다. 모델 파라미터와 피처 선택을 동시에 바꾸지 않습니다.
-- 저장 경로는 `Data/training/focused_features_recall87_v1/`입니다. `outer_metrics.csv`, `control_outer_metrics.csv`, `comparison.csv`, `evaluation.json`, Fold별 안쪽 순위와 선택 고정 기록, 실제 선택된 피처 목록, 재시작용 예측 캐시를 저장합니다.
-- 이전 결과를 살펴본 뒤 설계한 개발용 내부 실험입니다. 바깥 Recall 0.87을 보장하지 않으며, F1 0.85와의 동시 달성 여부를 그대로 기록합니다. 독립 최종 성능이나 배포용 전체 재학습 모델은 제공하지 않습니다.
-
-### 피처 선택 집중 실험 결과
-
-| 내부 5-Fold 평가 | 평균 비독성 F1 | 평균 독성 Recall | 최저 Fold Recall |
-|---|---:|---:|---:|
-| 이전 Optuna 전체 탐색 | 0.7202 | 0.8684 | 0.8395 |
-| 이번 고정 설정, 선택 없는 대조군 | 0.7174 | 0.8708 | 0.8434 |
-| 이번 피처 선택 포함 탐색 | 0.7182 | 0.8708 | 0.8421 |
-
-이번 실험의 피처 선택 추가 효과는 F1 약 +0.0008, Recall 약 +0.00001로 작았습니다. 평균 Recall 목표 0.87은 넘었지만 F1 0.85 목표는 미달입니다. 5개 Fold 중 3개가 Recall 0.87을 넘었습니다. 평균 개선을 모든 Fold의 Recall 보장으로 해석하지 않습니다.
-
-선택 결과는 Fold 0과 4에서 LightGBM gain Top 1,536, Fold 1에서 선택 없는 앙상블, Fold 2에서 선택 피처를 포함한 앙상블, Fold 3에서 선택 없는 LightGBM입니다. `selected_methods.csv`와 Fold별 `*_features.json`에 실제 선택 목록을 저장했습니다. 한 전역 피처 목록을 뽑아 전체 데이터를 다시 평가하지 않았습니다.
-
-같은 분할의 8,349개 OOF 행, 모델별 학습 데이터 경계, 후보 24개/Fold, 선택 목록 크기, 저장된 예측으로 계산한 F1과 Recall, 원본 데이터/코드 해시를 확인했습니다. 합성 데이터에서는 검증 데이터의 값과 라벨을 바꿔도 학습 피처 순위가 바뀌지 않는지, 대조군 비교와 캐시 재시작이 같은 결과인지 검증했습니다. 배포용 모델 재학습은 포함하지 않습니다.
-
-## 다음 실험: F1 하한을 두고 Recall 최대화
-
-현재 목표는 **비독성 F1 ≥ 0.82 조건에서 독성 Recall 최대화**, 희망 F1은 0.83 이상입니다. `analysis/f1_floor_search.py`에 구현했으며, 합성 데이터 검증과 기존 안쪽 예측 재채점만 완료했습니다. 새 목표의 실제 추가 학습 실험은 아직 실행하지 않았습니다.
-
-```bash
-# 실행 계획 확인
-.venv/bin/python -m analysis.f1_floor_search --dry-run
-
-# 내일 실행할 첫 탐색: 기존 안쪽 예측 재활용 + Fold당 추가 12개 trial
-.venv/bin/python -u -m analysis.f1_floor_search --trials 12
-
-# 같은 조건으로 중단된 실행을 이어가기
-.venv/bin/python -u -m analysis.f1_floor_search --trials 12 --resume
-```
-
-새 환경에서는 `python -m pip install -r requirements-training.txt`로 설치한 Python을 사용합니다. 기존 안쪽 OOF 중 LightGBM, XGBoost 후보만 해당 Fold에서 재채점해 Optuna TPE 초기 이력으로 사용합니다. 추가 trial은 안쪽 5-Fold 전체를 평가하며, 이번 목표에서는 pruning을 사용하지 않습니다. 바깥 Fold의 라벨은 모델과 임계값 선택에 사용하지 않습니다.
-
-F1 하한을 만족하는 후보가 없으면 달성 가능한 최고 F1 설정을 진단용으로 반환하고 `f1_floor_met=false`로 명시합니다. 이때는 F1 하한 미달 후보를 목표 달성으로 세지 않으며, 목적값은 하한과의 차이로 계산해 먼저 F1을 개선합니다. 가능한 후보는 Recall 목적값으로 비교합니다. 현재 이전 후보의 안쪽 최고 F1은 Fold별 약 0.792~0.806으로 하한에 못 미칩니다. 이는 새 추가 탐색의 결과가 아닙니다.
-
-결과는 `Data/training/f1floor82_recall_v1/`에 저장합니다. 안쪽/바깥 하한 달성 여부, 바깥 F1과 Recall, 최고 달성 가능 F1, 선택 기록과 예측, Optuna SQLite와 sampler 상태를 남깁니다. 기존 실험을 검토한 뒤 수행하는 개발용 내부 평가이며, 바깥 F1 0.82를 보장하지 않습니다.
+전처리와 피처 선택은 각 학습 Fold 안에서만 수행합니다. 바깥 평가에서 목표 달성을 보장하지 않습니다.
